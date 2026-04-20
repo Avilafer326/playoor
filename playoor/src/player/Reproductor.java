@@ -8,12 +8,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class Reproductor implements Runnable {
-    private final String archivo;
+
+    private Runnable alTerminar;
     private Player player;
     private Thread hilo;
+    private final String archivo;
+    private final Object lock = new Object();
     private boolean reproduciendo;
     private boolean pausado;
-    private final Object lock = new Object();
 
     public Reproductor(String archivo) {
         this.archivo = archivo;
@@ -75,6 +77,7 @@ public class Reproductor implements Runnable {
             reproduciendo = false;
             if (!pausado) {
                 IO.println("Reproducción finalizada.");
+                if (alTerminar != null) alTerminar.run();
             }
         }
     }
@@ -116,6 +119,10 @@ public class Reproductor implements Runnable {
 
     public boolean estaPausado() {
         return pausado;
+    }
+
+    public void setAlTerminar(Runnable callback){
+        this.alTerminar = callback;
     }
 
 

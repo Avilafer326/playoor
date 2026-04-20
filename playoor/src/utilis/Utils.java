@@ -1,18 +1,18 @@
 package utilis;
 
-import player.Reproductor;
-
-import java.awt.image.ImagingOpException;
-import java.io.File;
-import java.util.NoSuchElementException;
-
 import lists.CDLlist;
+import player.Reproductor;
+import stack.DStack;
+
+import java.io.File;
 
 public class Utils {
 
     private final String CARPETA_MUSICA = "playoor/musica";
     private final CDLlist<String> listaCanciones = new CDLlist<>();
+    private final DStack<Playlist> stackPlaylists = new DStack<>();
     private boolean modoRepeat = false;
+    private boolean reproduciendoPlaylist = false;
 
 
     private Reproductor reproductor;
@@ -108,9 +108,9 @@ public class Utils {
             IO.println("No hay ninguna reproducción activa");
             return;
         }
-        if (reproductor.estaReproduciendo()){
+        if (reproductor.estaReproduciendo()) {
             reproductor.pausar();
-        }else{
+        } else {
             reproductor.reanudar();
         }
 
@@ -118,14 +118,14 @@ public class Utils {
 
     //----------------------------------------------------------------------------------- Anterior canción
 
-    public void anterior(){
-        try{
+    public void anterior() {
+        try {
             listaCanciones.isEmpty();
         } catch (Exception e) {
             IO.println("No hay canciones en la lista");
             return;
         }
-        if (reproductor != null && reproductor.estaReproduciendo()){
+        if (reproductor != null && reproductor.estaReproduciendo()) {
             reproductor.detener();
         }
         String ruta = listaCanciones.previous();
@@ -135,14 +135,14 @@ public class Utils {
 
     //----------------------------------------------------------------------------------- Siguiente canción
 
-    public void siguiente(){
-        try{
+    public void siguiente() {
+        try {
             listaCanciones.isEmpty();
         } catch (Exception e) {
             IO.println("No hay canciones en la lista");
             return;
         }
-        if (reproductor != null && reproductor.estaReproduciendo()){
+        if (reproductor != null && reproductor.estaReproduciendo()) {
             reproductor.detener();
         }
 
@@ -154,35 +154,35 @@ public class Utils {
 
     //----------------------------------------------------------------------------------- Shuffle
 
-    public void shuffle(){
-        try{
+    public void shuffle() {
+        try {
             listaCanciones.isEmpty();
         } catch (Exception e) {
             IO.println("No hay canciones en la lista");
             return;
         }
-        if (reproductor != null && reproductor.estaReproduciendo()){
+        if (reproductor != null && reproductor.estaReproduciendo()) {
             reproductor.detener();
         }
 
-        int random = (int)(Math.random()*listaCanciones.getIndice());
+        int random = (int) (Math.random() * listaCanciones.getIndice());
         String ruta = listaCanciones.getElementAt(random).getElemento();
-        reproductor= new Reproductor(ruta);
+        reproductor = new Reproductor(ruta);
         reproductor.reproducir();
         IO.println("Shuffle: " + new File(ruta).getName());
     }
 
     //----------------------------------------------------------------------------------- Modo Repeat
 
-    public void repeat(){
+    public void repeat() {
         modoRepeat = listaCanciones.repeat();
         IO.println("Repeat " + (modoRepeat ? "Activado" : "Desactivado"));
     }
 
     //----------------------------------------------------------------------------------- Adelantar la canción
 
-    public void seek(){
-        if (reproductor == null || !reproductor.estaReproduciendo()){
+    public void seek() {
+        if (reproductor == null || !reproductor.estaReproduciendo()) {
             IO.println("No se está reproduciendo nada actualmente");
             return;
         }
@@ -190,14 +190,56 @@ public class Utils {
         IO.println(">>> 5 segundos");
     }
 
-
-
-
     public Reproductor getReproductor() {
         return reproductor;
     }
 
     public void setReproductor(Reproductor reproductor) {
         this.reproductor = reproductor;
+    }
+
+    //----------------------------------------------------------------------------------- Métodos para el playlist
+
+    public void agregarPlaylist(Playlist playlist) {
+        stackPlaylists.push(playlist);
+        IO.println("Playlist '" + playlist.getNombre() + "' agregada");
+    }
+
+    public void reproducirStackPlaylists() {
+        if (stackPlaylists.isEmpty()) {
+            IO.println("No hay playlists en el stack");
+            return;
+        }
+        reproduciendoPlaylist = true;
+        reproducirSiguienteStack();
+    }
+
+    public void reproducirSiguienteStack() {
+        try {
+            Playlist actual = stackPlaylists.peek();
+            if (!actual.estaVacia()) {
+                String ruta = actual.siguienteCancion();
+                if (reproductor != null && reproductor.estaReproduciendo()) {
+                    reproductor.detener();
+                }
+                reproductor = new Reproductor(ruta);
+                reproductor.setAlTerminar(() -> {
+                    if (reproduciendoPlaylist) reproducirSiguienteStack();
+                });
+                reproductor.reproducir();
+            } else {
+                stackPlaylists.pop();
+                IO.println("Playlist terminada. Pasando a la siguiente...");
+                if (!stackPlaylists.isEmpty()) {
+                    reproducirSiguienteStack();
+                } else {
+                    IO.println("Todas las playlist termiaron");
+                    reproduciendoPlaylist = false;
+                }
+            }
+        } catch (Exception e) {
+            IO.println("No hay más playlists");
+            reproduciendoPlaylist = false;
+        }
     }
 }
