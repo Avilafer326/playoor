@@ -124,7 +124,22 @@ public class Utils {
         reproductor.reproducir();
     }
 
+    //----------------------------------------------------------------------------------- Anterior canción
 
+    public void anterior(){
+        try{
+            listaCanciones.isEmpty();
+        } catch (Exception e) {
+            IO.println("No hay canciones en la lista");
+            return;
+        }
+        if (reproductor != null && reproductor.estaReproduciendo()){
+            reproductor.detener();
+        }
+        String ruta = listaCanciones.previous();
+        reproductor = new Reproductor(ruta);
+        reproductor.reproducir();
+    }
 
 
 
