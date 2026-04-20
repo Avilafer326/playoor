@@ -6,13 +6,14 @@ import lists.CDLlist;
 
 public class Utils {
 
-    private  final String CARPETA_MUSICA = "playoor/musica";
+    private final String CARPETA_MUSICA = "playoor/musica";
     private final CDLlist<String> listaCanciones = new CDLlist<>();
 
     private Reproductor reproductor ;
 
     public Utils() {
         this.setReproductor(null);
+        cargarCanciones();
     }
     public void mostrarAyuda() {
         IO.println("\nComandos disponibles:");
@@ -24,42 +25,55 @@ public class Utils {
     }
 
     public void listarCanciones() {
-        File carpeta = new File(CARPETA_MUSICA);
-        if (!carpeta.exists() || !carpeta.isDirectory()) {
-            IO.println("La carpeta '" + CARPETA_MUSICA + "' no existe. Créala y agrega archivos MP3.");
+        try {
+            listaCanciones.isEmpty();
+        } catch (Exception e) {
+            IO.println("No hay canciones en la lista.");
             return;
         }
-
-        File[] archivos = carpeta.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp3"));
-        if (archivos == null || archivos.length == 0) {
-            IO.println("No hay archivos MP3 en la carpeta '" + CARPETA_MUSICA + "'.");
-        } else {
-            IO.println("Canciones disponibles:");
-            for (int i = 0; i < archivos.length; i++) {
-                IO.println((i + 1) + ". " + archivos[i].getName());
-            }
+        IO.println("Canciones disponibles:");
+        int i = 1;
+        for (String ruta : listaCanciones) {
+            IO.println(i++ + ". " + new File(ruta).getName());
         }
     }
 
-    public void reproducirCancion(int index) {
+    private void cargarCanciones() {
         File carpeta = new File(CARPETA_MUSICA);
+        if (!carpeta.exists() || !carpeta.isDirectory()) return;
         File[] archivos = carpeta.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp3"));
-        if (archivos == null || archivos.length == 0) {
+        if (archivos == null) return;
+        for (File f : archivos) {
+            listaCanciones.add(f.getAbsolutePath());
+        }
+    }
+
+    //El metodo recibe el indice de la cancion que quiere reproducir
+    public void reproducirCancion(int index) {
+
+        //Lanza la excepcion si la lista está vacía
+        try {
+            listaCanciones.isEmpty();
+        } catch (Exception e) {
             IO.println("No hay canciones para reproducir.");
             return;
         }
-        if (index < 1 || index > archivos.length) {
-            IO.println("Número de canción inválido. Usa list para ver los números.");
+
+
+        if (index < 1 || index > listaCanciones.getIndice()) {
+            IO.println("Número inválido. Usa list para ver los números.");
             return;
         }
+        //Valida si la opción está dentro del rango
 
-        // Si hay una reproducción actual, la detenemos
+
         if (reproductor != null && reproductor.estaReproduciendo()) {
             reproductor.detener();
         }
+        //Si ya hay una canción sonando primero la detiene antes de reproducir la nueva
 
-        String rutaCompleta = archivos[index - 1].getAbsolutePath();
-        reproductor =  new Reproductor(rutaCompleta);
+        String ruta = listaCanciones.getElementAt(index - 1).getElemento();
+        reproductor = new Reproductor(ruta);
         reproductor.reproducir();
     }
 
