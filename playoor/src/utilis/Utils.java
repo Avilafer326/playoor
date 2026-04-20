@@ -1,7 +1,10 @@
 package utilis;
 
 import player.Reproductor;
+
 import java.io.File;
+import java.util.NoSuchElementException;
+
 import lists.CDLlist;
 
 public class Utils {
@@ -9,12 +12,13 @@ public class Utils {
     private final String CARPETA_MUSICA = "playoor/musica";
     private final CDLlist<String> listaCanciones = new CDLlist<>();
 
-    private Reproductor reproductor ;
+    private Reproductor reproductor;
 
     public Utils() {
         this.setReproductor(null);
         cargarCanciones();
     }
+
     public void mostrarAyuda() {
         IO.println("\nComandos disponibles:");
         IO.println("  list              - Lista las canciones disponibles");
@@ -48,6 +52,7 @@ public class Utils {
         }
     }
 
+    //----------------------------------------------------------------------------------- Reproducir canción
     //El metodo recibe el indice de la cancion que quiere reproducir
     public void reproducirCancion(int index) {
 
@@ -76,6 +81,7 @@ public class Utils {
         reproductor = new Reproductor(ruta);
         reproductor.reproducir();
     }
+//----------------------------------------------------------------------------------- Detener canción
 
     public void detenerReproduccion() {
         if (reproductor != null && reproductor.estaReproduciendo()) {
@@ -85,6 +91,46 @@ public class Utils {
             IO.println("No hay ninguna reproducción activa.");
         }
     }
+
+//----------------------------------------------------------------------------------- Pausar canción
+
+    public void pausaReanudar() {
+        if (reproductor == null || (!reproductor.estaReproduciendo() && !reproductor.estaPausado())) {
+            IO.println("No hay ninguna reproducción activa");
+            return;
+        }
+        if (reproductor.estaReproduciendo()){
+            reproductor.pausar();
+        }else{
+            reproductor.reanudar();
+        }
+
+    }
+
+    //----------------------------------------------------------------------------------- Siguiente canción
+
+    public void siguiente(){
+        try{
+            listaCanciones.isEmpty();
+        } catch (Exception e) {
+            IO.println("No hay canciones en la lista");
+            return;
+        }
+        if (reproductor != null && reproductor.estaReproduciendo()){
+            reproductor.detener();
+        }
+        String ruta = listaCanciones.next();
+        reproductor = new Reproductor(ruta);
+        reproductor.reproducir();
+    }
+
+
+
+
+
+
+
+
 
     public Reproductor getReproductor() {
         return reproductor;
