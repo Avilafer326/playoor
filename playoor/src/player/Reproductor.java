@@ -77,6 +77,20 @@ public class Reproductor implements Runnable {
             IO.println("Reanudando...");
         }
     }
+
+    public void seek(int frames){
+        if (!reproduciendo || player == null){
+            IO.println("No se está reproduciendo nada actualmente");
+            return;
+        }
+        try{
+            player.play(frames); //Se brinca hacia adelante las partes de la canción
+            IO.println(">>> 5 segundos");
+        }catch (JavaLayerException e){
+            IO.println("Error al adelantar: " + e.getMessage());
+        }
+    }
+
     public boolean estaPausado(){
         return pausado;
     }

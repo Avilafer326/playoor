@@ -172,7 +172,16 @@ public class Utils {
         IO.println("Repeat " + (modoRepeat ? "Activado" : "Desactivado"));
     }
 
+    //----------------------------------------------------------------------------------- Adelantar la canción
 
+    public void seek(){
+        if (reproductor == null || !reproductor.estaReproduciendo()){
+            IO.println("No se está reproduciendo nada actualmente");
+            return;
+        }
+        reproductor.seek(150);
+        IO.println(">>> 5 segundos");
+    }
 
 
 
