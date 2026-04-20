@@ -2,6 +2,7 @@ package utilis;
 
 import player.Reproductor;
 
+import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.util.NoSuchElementException;
 
@@ -139,6 +140,26 @@ public class Utils {
         String ruta = listaCanciones.previous();
         reproductor = new Reproductor(ruta);
         reproductor.reproducir();
+    }
+
+    //----------------------------------------------------------------------------------- Shuffle
+
+    public void shuffle(){
+        try{
+            listaCanciones.isEmpty();
+        } catch (Exception e) {
+            IO.println("No hay canciones en la lista");
+            return;
+        }
+        if (reproductor != null && reproductor.estaReproduciendo()){
+            reproductor.detener();
+        }
+
+        int random = (int)(Math.random()*listaCanciones.getIndice());
+        String ruta = listaCanciones.getElementAt(random).getElemento();
+        reproductor= new Reproductor(ruta);
+        reproductor.reproducir();
+        IO.println("Shuffle: " + new File(ruta).getName());
     }
 
 
