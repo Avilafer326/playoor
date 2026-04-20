@@ -33,6 +33,8 @@ public class Utils {
         IO.println("  shuffle           - Canción aleatoria");
         IO.println("  repeat            - Activa/desactiva la repetición de la canción actual");
         IO.println("  seek              - Avanza 5 segundos a la reproducción actual");
+        IO.println("  newpl             - Crea una nueva playlist");
+        IO.println("  playlists         - Reproduce el stack de playlists");
         IO.println("  help / ayuda      - Muestra esta ayuda");
         IO.println("  exit / salir      - Salir del programa\n");
     }
@@ -241,5 +243,14 @@ public class Utils {
             IO.println("No hay más playlists");
             reproduciendoPlaylist = false;
         }
+    }
+
+    public void agregarAPlaylist(Playlist playlist, int index) {
+        if (index < 1 || index > listaCanciones.getIndice()) {
+            IO.println("Número inválido");
+            return;
+        }
+        String ruta = listaCanciones.getElementAt(index - 1).getElemento();
+        playlist.agregarCanciones(ruta);
     }
 }

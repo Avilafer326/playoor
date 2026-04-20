@@ -16,6 +16,7 @@ public class Reproductor implements Runnable {
     private final Object lock = new Object();
     private boolean reproduciendo;
     private boolean pausado;
+    private boolean detenerManual = false;
 
     public Reproductor(String archivo) {
         this.archivo = archivo;
@@ -24,16 +25,16 @@ public class Reproductor implements Runnable {
 
     // Inicia la reproducción en un nuevo hilo
     public void reproducir() {
-        if (reproduciendo) {
-            IO.println("Ya hay una reproducción en curso. Detenla primero.");
-            return;
-        }
+        if (reproduciendo || pausado) return;
+        detenerManual = false;
         hilo = new Thread(this);
+        hilo.setDaemon(true);
         hilo.start();
     }
 
     // Detiene la reproducción
     public void detener() {
+        detenerManual = true;
         if (player != null) {
             player.close();
         }
@@ -75,7 +76,7 @@ public class Reproductor implements Runnable {
             IO.println("Error al reproducir: " + e.getMessage());
         } finally {
             reproduciendo = false;
-            if (!pausado) {
+            if (!pausado && !detenerManual) {
                 IO.println("Reproducción finalizada.");
                 if (alTerminar != null) alTerminar.run();
             }
@@ -121,7 +122,7 @@ public class Reproductor implements Runnable {
         return pausado;
     }
 
-    public void setAlTerminar(Runnable callback){
+    public void setAlTerminar(Runnable callback) {
         this.alTerminar = callback;
     }
 

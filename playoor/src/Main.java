@@ -1,5 +1,5 @@
+import utilis.Playlist;
 import utilis.Utils;
-
 
 void main(String[] args) {
     Utils utilis = new Utils();
@@ -27,7 +27,7 @@ void main(String[] args) {
             } catch (NumberFormatException e) {
                 IO.println("Debes indicar el número de canción. Ejemplo: play 2");
             }
-        }  else if (comando.equals("pause")) {
+        } else if (comando.equals("pause")) {
             utilis.pausaReanudar();
         } else if (comando.equals("stop")) {
             utilis.detenerReproduccion();
@@ -41,6 +41,26 @@ void main(String[] args) {
             utilis.repeat();
         } else if (comando.equals("seek")) {
             utilis.seek();
+        } else if (comando.equals("newpl")) {
+            IO.print("Nombre de la playlist: ");
+            String nombre = IO.readln().trim();
+            Playlist pl = new Playlist(nombre);
+            utilis.listarCanciones();
+            IO.println("Escribe los números de canciones (0 para terminar):");
+            while (true) {
+                IO.print("  Canción #: ");
+                String entrada = IO.readln().trim();
+                try {
+                    int idx = Integer.parseInt(entrada);
+                    if (idx == 0) break;
+                    utilis.agregarAPlaylist(pl, idx);
+                } catch (NumberFormatException e) {
+                    IO.println("Número inválido.");
+                }
+            }
+            utilis.agregarPlaylist(pl);
+        } else if (comando.equals("playlists")) {
+            utilis.reproducirStackPlaylists();
         } else if (comando.equals("help") || comando.equals("ayuda")) {
             utilis.mostrarAyuda();
         } else {
