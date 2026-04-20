@@ -40,6 +40,61 @@ public class Playlist {
         canciones.enqueue(actual);
         return anterior;
     }
+    public void listarCanciones() {
+        if (estaVacia()) {
+            IO.println("La playlist está vacía.");
+            return;
+        }
+        IO.println("Canciones en la playlist:");
+        // Vaciamos, mostramos y reconstruimos
+        DQueue<String> temp = new DQueue<>();
+        int i = 1;
+        while (!estaVacia()) {
+            String ruta = canciones.dequeue();
+            IO.println(i++ + ". " + new File(ruta).getName());
+            temp.enqueue(ruta);
+        }
+        // Restaurar
+        while (true) {
+            try {
+                temp.isEmpty();
+                canciones.enqueue(temp.dequeue());
+            } catch (Exception e) {
+                break;
+            }
+        }
+    }
+
+    public void eliminarCancion(int index) {
+        if (estaVacia()) {
+            IO.println("La playlist está vacía.");
+            return;
+        }
+        DQueue<String> temp = new DQueue<>();
+        int i = 1;
+        boolean eliminada = false;
+        while (!estaVacia()) {
+            String ruta = canciones.dequeue();
+            if (i == index) {
+                IO.println("Eliminada: " + new File(ruta).getName());
+                eliminada = true;
+            } else {
+                temp.enqueue(ruta);
+            }
+            i++;
+        }
+        if (!eliminada) IO.println("Número inválido.");
+        // Restaurar
+        while (true) {
+            try {
+                temp.isEmpty();
+                canciones.enqueue(temp.dequeue());
+            } catch (Exception e) {
+                break;
+            }
+        }
+    }
+
 
     public boolean tieneAnterior() {
         return !historial.isEmpty();

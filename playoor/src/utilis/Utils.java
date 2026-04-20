@@ -35,6 +35,7 @@ public class Utils {
         IO.println("  seek              - Avanza 5 segundos a la reproducción actual");
         IO.println("  newpl             - Crea una nueva playlist");
         IO.println("  playlists         - Reproduce el stack de playlists");
+        IO.println("  editpl            - Editar/crear una playlist nueva");
         IO.println("  help / ayuda      - Muestra esta ayuda");
         IO.println("  exit / salir      - Salir del programa\n");
     }
