@@ -14,6 +14,7 @@ public class Utils {
     private final CDLlist<String> listaCanciones = new CDLlist<>();
     private boolean modoRepeat = false;
 
+
     private Reproductor reproductor;
 
     public Utils() {

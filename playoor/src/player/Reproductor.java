@@ -13,6 +13,7 @@ public class Reproductor implements Runnable {
     private Thread hilo;
     private boolean reproduciendo;
     private boolean pausado;
+    private final Object lock = new Object();
 
     public Reproductor(String archivo) {
         this.archivo = archivo;
@@ -46,7 +47,28 @@ public class Reproductor implements Runnable {
             player = new Player(bis);
             reproduciendo = true;
             IO.println("Reproduciendo: " + archivo);
-            player.play(); // Bloquea hasta que termine el archivo o se cierre
+
+            boolean hayMas = true;
+            while (hayMas) {
+                synchronized (lock) {
+                    while (pausado) {
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            return;
+                        }
+
+                    }
+                }
+                try {
+                    hayMas = player.play(1);
+                } catch (JavaLayerException e) {
+                    if (!pausado) IO.println("Error en frame: " + e.getMessage());
+                    break;
+                }
+            }
+            //player.play(); // Bloquea hasta que termine el archivo o se cierre
         } catch (FileNotFoundException | JavaLayerException e) {
             IO.println("Error al reproducir: " + e.getMessage());
         } finally {
@@ -64,23 +86,19 @@ public class Reproductor implements Runnable {
     public void pausar() {
         if (!reproduciendo) return;
         pausado = true;
-        player.close();
-        try{
-            hilo.join();
-        }catch (InterruptedException e){
-            Thread.currentThread().interrupt();
-        }
         reproduciendo = false;
         IO.println("Pausado");
     }
 
     public void reanudar() {
-        if (!reproduciendo && pausado) {
-            pausado = false;
-            hilo = new Thread(this);
-            hilo.start();
-            IO.println("Reanudando...");
+        //if (!reproduciendo && pausado) {
+        if (!pausado) return;
+        pausado = false;
+        reproduciendo = true;
+        synchronized (lock) {
+            lock.notifyAll();
         }
+        IO.println("Reanudando...");
     }
 
     public void seek(int frames) {
