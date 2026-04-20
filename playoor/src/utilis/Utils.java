@@ -89,10 +89,12 @@ public class Utils {
         }
         //Si ya hay una canción sonando primero la detiene antes de reproducir la nueva
 
-        String ruta = listaCanciones.getElementAt(index - 1).getElemento();
-        listaCanciones.setCursorAt(index-1);
-        reproductor = new Reproductor(ruta);
-        reproductor.reproducir();
+        //String ruta = listaCanciones.getElementAt(index - 1).getElemento();
+        listaCanciones.setCursorAt(index - 1);
+        reproducirDesdeCursor();
+        //reproductor = new Reproductor(ruta);
+        //reproductor.reproducir();
+        //listaCanciones.setCursorAt(index - 1);
     }
 //----------------------------------------------------------------------------------- Detener canción
 
@@ -153,9 +155,11 @@ public class Utils {
         if (reproductor != null && reproductor.estaReproduciendo()) {
             reproductor.detener();
         }
-        String ruta = listaCanciones.previous();
-        reproductor = new Reproductor(ruta);
-        reproductor.reproducir();
+        listaCanciones.previous();
+        reproducirDesdeCursor();
+//        String ruta = listaCanciones.previous();
+//        reproductor = new Reproductor(ruta);
+//        reproductor.reproducir();
     }
 
     //----------------------------------------------------------------------------------- Siguiente canción
@@ -176,11 +180,12 @@ public class Utils {
         if (reproduciendoPlaylist) {
             reproducirSiguienteStack();
         } else {
-
+            listaCanciones.next();
+            reproducirDesdeCursor();
             //Si el repeat está activo reproduce la misma cancion actual al terminar
-            String ruta = modoRepeat ? listaCanciones.cursor() : listaCanciones.next();
-            reproductor = new Reproductor(ruta);
-            reproductor.reproducir();
+//            String ruta = modoRepeat ? listaCanciones.cursor() : listaCanciones.next();
+//            reproductor = new Reproductor(ruta);
+//            reproductor.reproducir();
         }
     }
 
@@ -251,6 +256,26 @@ public class Utils {
         reproduciendoPlaylist = true;
         reproducirSiguienteStack();
     }
+
+    private void reproducirDesdeCursor() {
+        String ruta = listaCanciones.cursor();
+
+        reproductor = new Reproductor(ruta);
+
+        reproductor.setAlTerminar(() -> {
+            if (reproduciendoPlaylist) return;
+
+            if (modoRepeat) {
+                reproducirDesdeCursor(); // misma canción
+            } else {
+                listaCanciones.next();
+                reproducirDesdeCursor(); // siguiente
+            }
+        });
+
+        reproductor.reproducir();
+    }
+
 
     public void reproducirSiguienteStack() {
         try {

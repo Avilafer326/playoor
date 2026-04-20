@@ -36,6 +36,7 @@ public class Reproductor implements Runnable {
     // Detiene la reproducción
     public void detener() {
         detenerManual = true;
+        alTerminar = null;
         if (player != null) {
             player.close();
         }
