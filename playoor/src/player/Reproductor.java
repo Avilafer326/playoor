@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 
 public class Reproductor implements Runnable {
 
-    private Runnable alTerminar;
+    private volatile Runnable alTerminar;
     private Player player;
     private Thread hilo;
     private final String archivo;

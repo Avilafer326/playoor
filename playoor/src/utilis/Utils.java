@@ -95,7 +95,8 @@ public class Utils {
 //----------------------------------------------------------------------------------- Detener canción
 
     public void detenerReproduccion() {
-        if (reproductor != null && reproductor.estaReproduciendo()) {
+        if (reproductor != null && (reproductor.estaReproduciendo() || reproductor.estaPausado())) {
+            reproduciendoPlaylist = false;
             reproductor.detener();
             IO.println("Reproducción detenida.");
         } else {
@@ -121,6 +122,26 @@ public class Utils {
     //----------------------------------------------------------------------------------- Anterior canción
 
     public void anterior() {
+        if (reproduciendoPlaylist) {
+            try {
+                Playlist actual = stackPlaylists.peek();
+                if (actual.tieneAnterior()) {
+                    if (reproductor != null) reproductor.detener();
+                    String ruta = actual.anteriorCancion();
+                    reproductor = new Reproductor(ruta);
+                    reproductor.setAlTerminar(() -> {
+                        if (reproduciendoPlaylist) reproducirSiguienteStack();
+                    });
+                    reproductor.reproducir();
+                } else {
+                    IO.println("No hay canción anterior en esta playlist.");
+                }
+            } catch (Exception e) {
+                IO.println("Error al retroceder.");
+            }
+            return;
+        }
+
         try {
             listaCanciones.isEmpty();
         } catch (Exception e) {
@@ -144,14 +165,21 @@ public class Utils {
             IO.println("No hay canciones en la lista");
             return;
         }
-        if (reproductor != null && reproductor.estaReproduciendo()) {
+
+        if (reproductor != null) {
+            reproductor.setAlTerminar(null);
             reproductor.detener();
         }
 
-        //Si el repeat está activo reproduce la misma cancion actual al terminar
-        String ruta = modoRepeat ? listaCanciones.cursor() : listaCanciones.next();
-        reproductor = new Reproductor(ruta);
-        reproductor.reproducir();
+        if (reproduciendoPlaylist) {
+            reproducirSiguienteStack();
+        } else {
+
+            //Si el repeat está activo reproduce la misma cancion actual al terminar
+            String ruta = modoRepeat ? listaCanciones.cursor() : listaCanciones.next();
+            reproductor = new Reproductor(ruta);
+            reproductor.reproducir();
+        }
     }
 
     //----------------------------------------------------------------------------------- Shuffle

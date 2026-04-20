@@ -1,12 +1,14 @@
 package utilis;
 
 import queue.*;
+import stack.*;
 import java.io.File;
 
 public class Playlist {
 
     private final String nombre;
     private final DQueue<String> canciones;
+    private final DStack<String> historial = new DStack<>();
 
     public Playlist(String nombre){
         this.nombre = nombre;
@@ -19,7 +21,28 @@ public class Playlist {
     }
 
     public String siguienteCancion(){
-        return canciones.dequeue();
+        String cancion = canciones.dequeue();
+        historial.push(cancion);
+        return cancion;
+    }
+
+    public String anteriorCancion() {
+        if (historial.isEmpty()) return null;
+
+        String actual = historial.pop();
+        if (historial.isEmpty()){
+            historial.push(actual);
+            return actual;
+        }
+
+        String anterior = historial.pop();
+        historial.push(anterior);
+        canciones.enqueue(actual);
+        return anterior;
+    }
+
+    public boolean tieneAnterior() {
+        return !historial.isEmpty();
     }
 
     public boolean estaVacia(){
