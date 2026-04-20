@@ -60,4 +60,26 @@ public class Reproductor implements Runnable {
     public boolean estaReproduciendo() {
         return reproduciendo;
     }
+
+    public void pausar(){
+        if (!reproduciendo)return;
+        pausado = true;
+        player.close();
+        reproduciendo = false;
+        IO.println("Pausado");
+    }
+
+    public void reanudar(){
+        if (reproduciendo || !pausado){
+            pausado = false;
+            hilo = new Thread(this);
+            hilo.start();
+            IO.println("Reanudando...");
+        }
+    }
+    public boolean estaPausado(){
+        return pausado;
+    }
+
+
 }
