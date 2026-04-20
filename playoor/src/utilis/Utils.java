@@ -25,9 +25,15 @@ public class Utils {
         IO.println("\nComandos disponibles:");
         IO.println("  list              - Lista las canciones disponibles");
         IO.println("  play <número>     - Reproduce la canción con ese número");
+        IO.println("  pause             - Pausa o reanuda la reproducción actual");
         IO.println("  stop              - Detiene la reproducción actual");
+        IO.println("  next              - Siguiente canción");
+        IO.println("  back              - Canción anterior");
+        IO.println("  shuffle           - Canción aleatoria");
+        IO.println("  repeat            - Activa/desactiva la repetición de la canción actual");
+        IO.println("  seek              - Avanza 5 segundos a la reproducción actual");
         IO.println("  help / ayuda      - Muestra esta ayuda");
-        IO.println("  exit / salir      - Sale del programa\n");
+        IO.println("  exit / salir      - Salir del programa\n");
     }
 
     public void listarCanciones() {
@@ -167,7 +173,7 @@ public class Utils {
 
     //----------------------------------------------------------------------------------- Modo Repeat
 
-    private void repeat(){
+    public void repeat(){
         modoRepeat = listaCanciones.repeat();
         IO.println("Repeat " + (modoRepeat ? "Activado" : "Desactivado"));
     }
