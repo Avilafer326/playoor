@@ -8,10 +8,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class Reproductor implements Runnable {
-    private String archivo;
+    private final String archivo;
     private Player player;
     private Thread hilo;
     private boolean reproduciendo;
+    private boolean pausado;
 
     public Reproductor(String archivo) {
         this.archivo = archivo;
@@ -50,7 +51,9 @@ public class Reproductor implements Runnable {
             IO.println("Error al reproducir: " + e.getMessage());
         } finally {
             reproduciendo = false;
-            IO.println("Reproducción finalizada.");
+            if (!pausado){
+                IO.println("Reproducción finalizada.");
+            }
         }
     }
 
