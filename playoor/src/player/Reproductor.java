@@ -51,7 +51,7 @@ public class Reproductor implements Runnable {
             IO.println("Error al reproducir: " + e.getMessage());
         } finally {
             reproduciendo = false;
-            if (!pausado){
+            if (!pausado) {
                 IO.println("Reproducción finalizada.");
             }
         }
@@ -61,16 +61,21 @@ public class Reproductor implements Runnable {
         return reproduciendo;
     }
 
-    public void pausar(){
-        if (!reproduciendo)return;
+    public void pausar() {
+        if (!reproduciendo) return;
         pausado = true;
         player.close();
+        try{
+            hilo.join();
+        }catch (InterruptedException e){
+            Thread.currentThread().interrupt();
+        }
         reproduciendo = false;
         IO.println("Pausado");
     }
 
-    public void reanudar(){
-        if (reproduciendo || !pausado){
+    public void reanudar() {
+        if (!reproduciendo && pausado) {
             pausado = false;
             hilo = new Thread(this);
             hilo.start();
@@ -78,20 +83,20 @@ public class Reproductor implements Runnable {
         }
     }
 
-    public void seek(int frames){
-        if (!reproduciendo || player == null){
+    public void seek(int frames) {
+        if (!reproduciendo || player == null) {
             IO.println("No se está reproduciendo nada actualmente");
             return;
         }
-        try{
+        try {
             player.play(frames); //Se brinca hacia adelante las partes de la canción
             IO.println(">>> 5 segundos");
-        }catch (JavaLayerException e){
+        } catch (JavaLayerException e) {
             IO.println("Error al adelantar: " + e.getMessage());
         }
     }
 
-    public boolean estaPausado(){
+    public boolean estaPausado() {
         return pausado;
     }
 
