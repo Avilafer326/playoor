@@ -12,6 +12,7 @@ public class Utils {
 
     private final String CARPETA_MUSICA = "playoor/musica";
     private final CDLlist<String> listaCanciones = new CDLlist<>();
+    private boolean modoRepeat = false;
 
     private Reproductor reproductor;
 
@@ -108,23 +109,6 @@ public class Utils {
 
     }
 
-    //----------------------------------------------------------------------------------- Siguiente canción
-
-    public void siguiente(){
-        try{
-            listaCanciones.isEmpty();
-        } catch (Exception e) {
-            IO.println("No hay canciones en la lista");
-            return;
-        }
-        if (reproductor != null && reproductor.estaReproduciendo()){
-            reproductor.detener();
-        }
-        String ruta = listaCanciones.next();
-        reproductor = new Reproductor(ruta);
-        reproductor.reproducir();
-    }
-
     //----------------------------------------------------------------------------------- Anterior canción
 
     public void anterior(){
@@ -138,6 +122,25 @@ public class Utils {
             reproductor.detener();
         }
         String ruta = listaCanciones.previous();
+        reproductor = new Reproductor(ruta);
+        reproductor.reproducir();
+    }
+
+    //----------------------------------------------------------------------------------- Siguiente canción
+
+    public void siguiente(){
+        try{
+            listaCanciones.isEmpty();
+        } catch (Exception e) {
+            IO.println("No hay canciones en la lista");
+            return;
+        }
+        if (reproductor != null && reproductor.estaReproduciendo()){
+            reproductor.detener();
+        }
+
+        //Si el repeat está activo reproduce la misma cancion actual al terminar
+        String ruta = modoRepeat ? listaCanciones.cursor() : listaCanciones.next();
         reproductor = new Reproductor(ruta);
         reproductor.reproducir();
     }
@@ -162,6 +165,12 @@ public class Utils {
         IO.println("Shuffle: " + new File(ruta).getName());
     }
 
+    //----------------------------------------------------------------------------------- Modo Repeat
+
+    private void repeat(){
+        modoRepeat = listaCanciones.repeat();
+        IO.println("Repeat " + (modoRepeat ? "Activado" : "Desactivado"));
+    }
 
 
 
