@@ -120,9 +120,7 @@ public class Reproductor implements Runnable {
     public void seek(int frames) {
         if (!reproduciendo) {
             IO.println("No se está reproduciendo nada actualmente");
-            return;
         }
-        framesPendientes = frames;
     }
 
     public boolean estaPausado() {

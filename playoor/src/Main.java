@@ -64,7 +64,13 @@ void main(String[] args) {
         } else if (comando.equals("editpl")) {
             IO.print("Nombre de la playlist: ");
             String nombre = IO.readln().trim();
-            Playlist pl = new Playlist(nombre);
+            Playlist pl = utilis.buscarPlaylist(nombre);
+            boolean esNueva = false;
+            if (pl == null) {
+                IO.println("Playlist no encontrada. Creando nueva...");
+                pl = new Playlist(nombre);
+                esNueva = true;
+            }
 
             while (true) {
                 IO.println("\n--- Editando: " + nombre + " (" + pl.size() + " canciones) ---");
@@ -103,8 +109,10 @@ void main(String[] args) {
                 } else if (opcion.equals("save")) {
                     if (pl.size() == 0) {
                         IO.println("La playlist está vacía, no se guardó.");
-                    } else {
+                    } else if (esNueva) {
                         utilis.agregarPlaylist(pl);
+                    } else {
+                        IO.println("Playlist '" + nombre + "' actualizada.");
                     }
                     break;
 

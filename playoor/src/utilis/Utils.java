@@ -32,7 +32,7 @@ public class Utils {
         IO.println("  back              - Canción anterior");
         IO.println("  shuffle           - Canción aleatoria");
         IO.println("  repeat            - Activa/desactiva la repetición de la canción actual");
-        IO.println("  seek              - Avanza 5 segundos a la reproducción actual");
+        IO.println("  seek              - Lista y enseguida selecciona tu opción");
         IO.println("  newpl             - Crea una nueva playlist");
         IO.println("  playlists         - Reproduce el stack de playlists");
         IO.println("  editpl            - Editar/crear una playlist nueva");
@@ -90,6 +90,7 @@ public class Utils {
         //Si ya hay una canción sonando primero la detiene antes de reproducir la nueva
 
         String ruta = listaCanciones.getElementAt(index - 1).getElemento();
+        listaCanciones.setCursorAt(index-1);
         reproductor = new Reproductor(ruta);
         reproductor.reproducir();
     }
@@ -213,12 +214,18 @@ public class Utils {
     //----------------------------------------------------------------------------------- Adelantar la canción
 
     public void seek() {
-        if (reproductor == null || !reproductor.estaReproduciendo()) {
-            IO.println("No se está reproduciendo nada actualmente");
+        listarCanciones();
+        try {
+            listaCanciones.isEmpty();
+        } catch (Exception e) {
+            IO.println("Algo");
             return;
         }
-        reproductor.seek(500);
-        IO.println(">>> Adelantando");
+
+        IO.print("Número de cancion a reproducir: ");
+        int index = Integer.parseInt(IO.readln().trim());
+
+        reproducirCancion(index);
     }
 
     public Reproductor getReproductor() {
@@ -281,5 +288,22 @@ public class Utils {
         }
         String ruta = listaCanciones.getElementAt(index - 1).getElemento();
         playlist.agregarCanciones(ruta);
+    }
+
+    public Playlist buscarPlaylist(String nombre) {
+        if (stackPlaylists.isEmpty()) return null;
+        DStack<Playlist> temp = new DStack<>();
+        Playlist encontrada = null;
+
+        while (!stackPlaylists.isEmpty()) {
+            Playlist pl = stackPlaylists.pop();
+            if (pl.getNombre().equals(nombre)) encontrada = pl;
+            temp.push(pl);
+        }
+        // Restaurar
+        while (!temp.isEmpty()) {
+            stackPlaylists.push(temp.pop());
+        }
+        return encontrada;
     }
 }

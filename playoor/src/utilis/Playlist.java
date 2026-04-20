@@ -20,6 +20,8 @@ public class Playlist {
         IO.println(new File(ruta).getName() + " agregada");
     }
 
+
+
     public String siguienteCancion(){
         String cancion = canciones.dequeue();
         historial.push(cancion);

@@ -364,4 +364,7 @@ public class CDLlist<T> implements Lists<T>, Iterable<T> {
         flag = !flag;
         return flag;
     }
+    public void setCursorAt(long indice) {
+        cursor = getElementAt(indice);
+    }
 }
