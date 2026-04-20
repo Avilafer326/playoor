@@ -1,12 +1,14 @@
 package utilis;
 
 import player.Reproductor;
-
 import java.io.File;
+import lists.CDLlist;
 
 public class Utils {
 
     private  final String CARPETA_MUSICA = "playoor/musica";
+    private final CDLlist<String> listaCanciones = new CDLlist<>();
+
     private Reproductor reproductor ;
 
     public Utils() {
