@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 
 public class Reproductor implements Runnable {
 
-    private volatile Runnable alTerminar;
     private Player player;
     private Thread hilo;
     private final String archivo;
@@ -17,6 +16,8 @@ public class Reproductor implements Runnable {
     private boolean reproduciendo;
     private boolean pausado;
     private boolean detenerManual = false;
+    private volatile Runnable alTerminar;
+    private volatile int framesPendientes = 0;
 
     public Reproductor(String archivo) {
         this.archivo = archivo;
@@ -52,23 +53,34 @@ public class Reproductor implements Runnable {
             IO.println("Reproduciendo: " + archivo);
 
             boolean hayMas = true;
-            while (hayMas) {
+            while (hayMas && !detenerManual) {
                 synchronized (lock) {
-                    while (pausado) {
+                    while (pausado && !detenerManual) {
                         try {
                             lock.wait();
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             return;
                         }
-
                     }
                 }
-                try {
-                    hayMas = player.play(1);
-                } catch (JavaLayerException e) {
-                    if (!pausado) IO.println("Error en frame: " + e.getMessage());
-                    break;
+                if (detenerManual) break;
+
+                if (framesPendientes > 0) {
+                    try {
+                        hayMas = player.play(framesPendientes);
+                        framesPendientes = 0;
+                        IO.println(">>> 5 segundos");
+                    }catch (JavaLayerException e){
+                        break;
+                    }
+                }else{
+                    try{
+                        hayMas = player.play(1);
+                    }catch (JavaLayerException e){
+                        if (!pausado) IO.println("Error:" + e.getMessage());
+                        break;
+                    }
                 }
             }
             //player.play(); // Bloquea hasta que termine el archivo o se cierre
@@ -106,16 +118,11 @@ public class Reproductor implements Runnable {
     }
 
     public void seek(int frames) {
-        if (!reproduciendo || player == null) {
+        if (!reproduciendo) {
             IO.println("No se está reproduciendo nada actualmente");
             return;
         }
-        try {
-            player.play(frames); //Se brinca hacia adelante las partes de la canción
-            IO.println(">>> 5 segundos");
-        } catch (JavaLayerException e) {
-            IO.println("Error al adelantar: " + e.getMessage());
-        }
+        framesPendientes = frames;
     }
 
     public boolean estaPausado() {

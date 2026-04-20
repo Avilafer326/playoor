@@ -216,8 +216,8 @@ public class Utils {
             IO.println("No se está reproduciendo nada actualmente");
             return;
         }
-        reproductor.seek(150);
-        IO.println(">>> 5 segundos");
+        reproductor.seek(500);
+        IO.println(">>> Adelantando");
     }
 
     public Reproductor getReproductor() {
