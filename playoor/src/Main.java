@@ -27,8 +27,20 @@ void main(String[] args) {
             } catch (NumberFormatException e) {
                 IO.println("Debes indicar el número de canción. Ejemplo: play 2");
             }
+        }  else if (comando.equals("pause")) {
+            utilis.pausaReanudar();
         } else if (comando.equals("stop")) {
             utilis.detenerReproduccion();
+        } else if (comando.equals("next")) {
+            utilis.siguiente();
+        } else if (comando.equals("back")) {
+            utilis.anterior();
+        } else if (comando.equals("shuffle")) {
+            utilis.shuffle();
+        } else if (comando.equals("repeat")) {
+            utilis.repeat();
+        } else if (comando.equals("seek")) {
+            utilis.seek();
         } else if (comando.equals("help") || comando.equals("ayuda")) {
             utilis.mostrarAyuda();
         } else {
